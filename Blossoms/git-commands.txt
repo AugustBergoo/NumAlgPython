@@ -1,0 +1,52 @@
+Git basics:
+* $ is the sign for a new command prompt in mac. You may have >> or something similar.
+* A good workflow can be:
+1. pull the latest changes from origin to be up to date.
+2. Modify your files.
+3. Do a stash, pull, stash pop sequence if someone changed the file at the same time you did.
+4. Add modified files to staging area (git add).
+5. Commit staged files (git commit).
+6. Push changes to origin (GitHub).
+
+See the status, i.e. see unstated files etc.:
+$ git status
+
+See the local commit history:
+$ git log
+
+Add edited file to staging area:
+$ git add <file_name>
+
+Add all edited files to staging area:
+$ git add -A
+
+Commit staged files:
+$ git commit -m ”A good commit message”
+
+Push commits to origin (GitHub):
+$ git push
+
+Pull commits from origin (GitHub):
+$ git pull
+
+Pull from origin when you have local, uncommitted, changes you don’t want to loose:
+$ git stash (”Take away” your local changes but saves them.)
+$ git pull (pull changes from origin)
+$ git stash pop (put back your local changes.)
+At merge conflict, edit the file with the conflict manually to remove the conflict.
+
+Reset the current branch head to <commit> and keep changes (<commit> is the commit id-code seen in git log):
+$ git reset --soft <commit>
+
+Reset the current branch head to <commit> and discard changes:
+$ git reset --hard <commit>
+
+Reset the current branch head to origin's head at <branch_name>
+$ git reset --hard origin/<branch_name> //Reset to origin/<branch_name>
+
+Remove staged files:
+$ git reset <file_name>
+
+Undo commits permanently:
+$ git reset --hard/soft HEAD~<nbr_commits_to_remove> (hard: remove changes, soft: keep the current commit as unstaged changes.)
+
