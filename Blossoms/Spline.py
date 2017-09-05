@@ -9,68 +9,68 @@ import numpy as np
 
 
 #calculates the value s(u) based on the knot points u_knots and the controll
-#points boor_points.
+#points boor_points. Here u is a float.
 def spline(u, u_knots, boor_points) :
+    u_knots = extend_u_knots(u_knots)
+    boor_points = extend_boor_points(boor_points)
     
+    hot_interval = find_hot_interval(u,u_knots)
+    relevant_boor_points = find_boor_points(hot_interval, boor_points)
     
-    u_knots = np.append([u_knots[0],u_knots[0]],u_knots[:])
-    u_knots = np.append(u_knots[:],[u_knots[-1],u_knots[-1]])
-    
-    boor_points = np.r_['0,2',boor_points,[boor_points[-1],boor_points[-1]]]
-    boor_points = np.r_['0,2',[boor_points[0],boor_points[0]],boor_points]
+    return blossom_recursion(u,u_knots,relevant_boor_points,hot_interval,2)
+
+
+
+
+#calculates a range of s(u) based on the knot points u_knots and the controll
+#points boor_points. Here u is a numpy array.
+def spline_set(u, u_knots, boor_points):
+    S = np.zeros((np.size(u),2))
+    for i in range(0,np.size(u)):
+        S[i,:] = spline(u[i],u_knots,boor_points)
+    return S
     
 
-    hot_interval = find_hot_interval(u,u_knots)
-    if range_check(u_knots,hot_interval):
-        relevant_boor_points = find_boor_points(hot_interval, boor_points)
-        return blossom_recursion(u,u_knots,relevant_boor_points,hot_interval,2)
-    else:
-        return ValueError('u value is dependent on values outside the interval')
+
+# extends the knots and boor points in order to define the spline at the edges 
+# of the interval
+def extend_u_knots(u_knots):
+    u_knots = np.append([u_knots[0],u_knots[0]],u_knots[:])
+    return np.append(u_knots[:],[u_knots[-1],u_knots[-1]])
     
-    
-    
-    
-    
+def extend_boor_points(boor_points):
+    boor_points = np.r_['0,2',boor_points,[boor_points[-1],boor_points[-1]]]
+    return np.r_['0,2',[boor_points[0],boor_points[0]],boor_points]
+
+
+
+
 # Finds the index of the hot interval i.e the index of the two knots between 
 # which the investigated value u is located.
 def find_hot_interval(u, u_knots) :
-    index = -1
+
+    index = np.argmax(u_knots>=u)
     
-    if u==u_knots[-1]:
-        index=np.size(u_knots)-4
-        return [index, index+1]
-    
-    for i in range(0,np.size(u_knots)):
-        if u>=u_knots[i] and u<u_knots[i+1]:
-            index = i
-            break
-            
-    if(index == -1) :
-        raise ValueError('It appears that u is not in the specified interval')
+    if(index != 0) :
+        return [index-1, index]
+    elif u==u_knots[-1]: 
+        return [np.size(u_knots)-4, np.size(u_knots)-3]
+    elif u==u_knots[0]:
+        return[2,3]
     else:
-        return [index, index+1]
+        raise ValueError('It appears that u is not in the specified interval')
     
     
     
-    
-# Checks that the the u value is not in need of knots outside the interval.
-def range_check(u_knots,hot_interval):
-    if hot_interval[0]-2<0 or hot_interval[0]+1>np.size(u_knots)-1:
-        return False
-    else: 
-        return True
-    
-    
-    
-    
+
 # returns the relevant boor points given the relevant interval.
 def find_boor_points(hot_interval, boor_points) :
     return np.matrix([[boor_points[hot_interval[0]-2,0],boor_points[hot_interval[0]-2,1]],
                       [boor_points[hot_interval[0]-1,0],boor_points[hot_interval[0]-1,1]],
                       [boor_points[hot_interval[0],0],boor_points[hot_interval[0],1]],
                       [boor_points[hot_interval[0]+1,0],boor_points[hot_interval[0]+1,1]]])
-    
 
+    
     
     
 # finds the value of s(u) recursively. Each function run determines the
