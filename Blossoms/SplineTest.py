@@ -14,7 +14,8 @@ import Spline as spl
 # are np.arrays, ordered in rising order, i.e [u1, u2, u3...] and [d1,d2,d3...].
 
 
-# we define knots and boor points:
+# We define knots and boor points:
+u=0;
 u_knots = np.array([0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.])
 boor_points = np.array([[0,0],[1,1],[2,4],[3,2],[4,7],[5,7],[6,6],[7,5],[8,7],[8,2],[7,2]])
 print(type(u),type(u_knots),type(boor_points))

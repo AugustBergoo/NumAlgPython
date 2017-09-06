@@ -8,7 +8,7 @@ from  pylab import *
 import numpy as np
 
 
-#calculates the value s(u) based on the knot points u_knots and the controll
+#Calculates the value s(u) based on the knot points u_knots and the controll
 #points boor_points. Here u is a float.
 def spline(u, u_knots, boor_points) :
     u_knots = extend_u_knots(u_knots)
