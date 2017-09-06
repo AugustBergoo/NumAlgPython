@@ -11,6 +11,15 @@ import numpy as np
 #calculates the value s(u) based on the knot points u_knots and the controll
 #points boor_points.
 def spline(u, u_knots, boor_points) :
+    
+    
+    u_knots = np.append([u_knots[0],u_knots[0]],u_knots[:])
+    u_knots = np.append(u_knots[:],[u_knots[-1],u_knots[-1]])
+    
+    boor_points = np.r_['0,2',boor_points,[boor_points[-1],boor_points[-1]]]
+    boor_points = np.r_['0,2',[boor_points[0],boor_points[0]],boor_points]
+    
+
     hot_interval = find_hot_interval(u,u_knots)
     if range_check(u_knots,hot_interval):
         relevant_boor_points = find_boor_points(hot_interval, boor_points)
@@ -26,9 +35,15 @@ def spline(u, u_knots, boor_points) :
 # which the investigated value u is located.
 def find_hot_interval(u, u_knots) :
     index = -1
+    
+    if u==u_knots[-1]:
+        index=np.size(u_knots)-4
+        return [index, index+1]
+    
     for i in range(0,np.size(u_knots)):
-        if u>=u_knots[i] and u<=u_knots[i+1] :
+        if u>=u_knots[i] and u<u_knots[i+1]:
             index = i
+            break
             
     if(index == -1) :
         raise ValueError('It appears that u is not in the specified interval')
