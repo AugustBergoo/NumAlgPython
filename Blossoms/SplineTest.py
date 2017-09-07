@@ -1,55 +1,31 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Sep  4 13:04:20 2017
-@author: Axel
+Last updated on 2017-09-07 16.01
+@author: Axel, Simon, August
 """
 from  scipy import *
 from  pylab import *
 import numpy as np
-import matplotlib.pyplot as plt
+
 import Spline as spl
 
-# Example code that gets s(u) given knots and boor points and plots the result.
-# Note that each knot has a corresponding boor point. It is important that these 
-# are np.arrays, ordered in rising order, i.e [u1, u2, u3...] and [d1,d2,d3...].
+#Den här filen testar bara vår spline klass. 
 
+# We define boor points and a grid:
+boor_points = np.array([[0,0], [1,1], [2,4], [3,2], [4,7], [5,7], [6,6], [7,5], [8,7], [8,2], [7,2]])
+boor_points2 = np.array([[0,7], [3,3], [1,1], [0,3], [3,4], [6,4], [7,6], [6,7], [5,5], [5,3], [6,1]])
+boor_points3 = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5], [6,6], [7,7]])
+grid = np.linspace(0, 1, 100)
 
-# We define knots and boor points:
-u=0;
-u_knots = np.array([0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.])
-boor_points = np.array([[0,0],[1,1],[2,4],[3,2],[4,7],[5,7],[6,6],[7,5],[8,7],[8,2],[7,2]])
-print(type(u),type(u_knots),type(boor_points))
+#Plotting different splines
+my_spline = spl.Spline(boor_points)
+my_spline(grid, True) #True if boor points shall be plotted, False otherwise. 
 
+my_spline2 = spl.Spline(boor_points2)
+my_spline2(grid, False)
 
-
-# Either use the spline directly and loop like this
-S = np.zeros((101,2))
-for i in range(0,101):
-    u=(i*0.01)
-    S[i,:] =  spl.spline(u,u_knots,boor_points)  
-
-print(type(S))
-plt.plot(boor_points[:,0],boor_points[:,1], 'r--')
-plt.plot(boor_points[:,0],boor_points[:,1], 'ro')
-plt.plot(S[:,0],S[:,1])
-plt.title("Looped spline: Cubic spline with its polynomial segments and it's controll polygon")
-plt.show()
-
-
-
-
-# Or you can use spline_set and send in an entire grid as a numpy array like this:
-u = np.arange(0,1.01,0.01)
-S = spl.spline_set(u,u_knots,boor_points) 
-
-print(type(S))
-plt.plot(boor_points[:,0],boor_points[:,1], 'g--')
-plt.plot(boor_points[:,0],boor_points[:,1], 'go')
-plt.plot(S[:,0],S[:,1])
-plt.title("spline_set: Cubic spline with its polynomial segments and it's controll polygon")
-plt.show()
-
-
-
+my_spline3 = spl.Spline(boor_points3)
+my_spline3(grid, True)
 
 
