@@ -29,7 +29,6 @@ class Spline():
     # plotted or not.
     def __call__(self, plot_boor=False):
         self.plot_spline(plot_boor)
-        #Return self.S???
         
         
     def __add__(self, spline):
@@ -41,16 +40,17 @@ class Spline():
         # splines' lengths are equal.
         if(length_1 >= length_2):
             boor = np.zeros((length_1, 2)) 
-            grid = np.linspace(0, 1, np.size(self.S, 0))
             zero = zeros((length_1-length_2, 2))
             spline.boor_points = np.concatenate([spline.boor_points, zero])
             
         elif(length_1 < length_2):
             boor = np.zeros((length_2, 2)) 
-            grid = np.linspace(0, 1, np.size(spline.S, 0))
             zero = zeros((length_2-length_1, 2))
             self.boor_points = np.concatenate([self.boor_points, zero])
-            
+           
+        # Creates a grid with the same size as the spline with most spline-points.
+        grid = np.linspace(0, 1, np.size(self.S, 0)) if (np.size(self.S, 0) > np.size(spline.S, 0)) else np.linspace(0, 1, np.size(spline.S, 0))
+        
         # Sums the (x,y)-coordinates elementwise in the de Boor points of spline1 and spline2  
         for i in range(np.size(boor, 0)):
             boor[i,0] = self.boor_points[i,0] + spline.boor_points[i,0]
