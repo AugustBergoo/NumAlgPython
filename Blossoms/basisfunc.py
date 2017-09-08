@@ -22,18 +22,19 @@ def heaviside_a(the_x):
 
 
 
-# Find N_j^3:
-def basisfunc(u_knots,j,k):
-    N = np.array([0,0])
-    print(N)
-    u = np.linspace(u_knots[j-1],u_knots[j+4], num = 50)
-    for i in range(j,j+2):
-        N[i-j] = heaviside_a(u-u_knots[j-1] - heaviside_a(u - u_knots[j])
-    N_old = N
-    for i in range(1,k+1):
-        U = array([((u-u_knots[j-1])/(u_knots[j+k-1]-u_knots[j-1])),((u_knots[j+k]-u)/(u_knots[j+k]-u_knots[j]))]);
-        N = U*N_old
-        N_old = N 
-    return sum(N);
+def coef(u,u_knots,j,k):
+    # u = np.linspace(u_knots[j-1],u_knots[j+4], num = 50)
+    c = np.array([((u-u_knots[j-1])/(u_knots[j+k-1]-u_knots[j-1])),((u_knots[j+k]-u)/(u_knots[j+k]-u_knots[j]))])
+    return c
+
+
+
+# Find N_j^k:
+def basisfunc(u,u_knots,j,k):
+    if (k>0):
+        N = coef(u,u_knots,j,k)[0]*basisfunc(u,u_knots,j,k-1) + coef(u,u_knots,j,k)[1]*basisfunc(u,u_knots,j+1,k-1) 
+    else:
+        N = heaviside_a(u-u_knots[j-1]) - heaviside_a(u - u_knots[j])
+    return N;
     
     
