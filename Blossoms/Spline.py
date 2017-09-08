@@ -13,33 +13,60 @@ import matplotlib.pyplot as plt
 class Spline():
     
     # Acts as the Constructor and assigns the attributes.
-    def __init__(self, boor_points):
+    def __init__(self, boor_points, grid):
         # Attributes
-        self.u_knots = np.linspace(0, 1, np.size(boor_points)/2)
+        self.u_knots = np.linspace(0, 1, np.size(boor_points, 0))
         self.boor_points = boor_points
+        self.S = np.zeros((np.size(grid), 2))
         
         # Extends the lengths of the attributes.
         self.extend_u_knots() 
-        self.extend_boor_points()
-       
-    # Calculates and plots the spline given a grid.
-    # plot_boor is a boolean indicating whether the boor points should be 
-    # plotter or not.
-    def __call__(self, grid, plot_boor):
-        S = self.calc_spline(grid)  
-        self.plot_spline(S, plot_boor)
+        extended_boor_points = self.extend_boor_points()
         
+        self.calc_spline(grid, extended_boor_points)  
+       
+    # Plots the spline, plot_boor is a boolean indicating whether the boor points should be 
+    # plotted or not.
+    def __call__(self, plot_boor=False):
+        self.plot_spline(plot_boor)
+        #Return self.S???
+        
+        
+    def __add__(self, spline):
+        length_1 = np.size(self.boor_points, 0)
+        length_2 = np.size(spline.boor_points, 0)
+        
+        # Determines which spline is the longest and adds zeros to the end
+        # of the shorter spline's boor_points-vector, until both of the 
+        # splines' lengths are equal.
+        if(length_1 >= length_2):
+            boor = np.zeros((length_1, 2)) 
+            grid = np.linspace(0, 1, np.size(self.S, 0))
+            zero = zeros((length_1-length_2, 2))
+            spline.boor_points = np.concatenate([spline.boor_points, zero])
+            
+        elif(length_1 < length_2):
+            boor = np.zeros((length_2, 2)) 
+            grid = np.linspace(0, 1, np.size(spline.S, 0))
+            zero = zeros((length_2-length_1, 2))
+            self.boor_points = np.concatenate([self.boor_points, zero])
+            
+        # Sums the (x,y)-coordinates elementwise in the de Boor points of spline1 and spline2  
+        for i in range(np.size(boor, 0)):
+            boor[i,0] = self.boor_points[i,0] + spline.boor_points[i,0]
+            boor[i,1] = self.boor_points[i,1] + spline.boor_points[i,1]
+        
+        return Spline(boor, grid)
+
     # Calculates the whole spline point by point.
-    def calc_spline(self, grid):
-        S = np.zeros((np.size(grid), 2))
+    def calc_spline(self, grid, extended_boor_points):       
         for i in range(0, np.size(grid)):
-            S[i,:] = self.calc_spline_point(grid[i])
-        return S    
+            self.S[i,:] = self.calc_spline_point(grid[i], extended_boor_points)   
         
     # Calculates a single spline point.
-    def calc_spline_point(self, grid_point):
+    def calc_spline_point(self, grid_point, extended_boor_points):
         hot_interval = self.find_hot_interval(grid_point)
-        relevant_boor_points = self.find_boor_points(hot_interval)
+        relevant_boor_points = self.find_boor_points(hot_interval, extended_boor_points)
         
         return self.blossom_recursion(grid_point, relevant_boor_points, hot_interval)
 
@@ -51,9 +78,9 @@ class Spline():
         self.u_knots = np.append(self.u_knots[:], [self.u_knots[-1], self.u_knots[-1]])
         
     def extend_boor_points(self):
-        self.boor_points = np.r_['0,2', self.boor_points, [self.boor_points[-1], self.boor_points[-1]]]
-        self.boor_points = np.r_['0,2', [self.boor_points[0], self.boor_points[0]], self.boor_points]
-    
+        extended_boor_points = np.r_['0,2', self.boor_points, [self.boor_points[-1], self.boor_points[-1]]]
+        return np.r_['0,2', [self.boor_points[0], self.boor_points[0]], extended_boor_points]
+
     
     # Finds the index of the hot interval i.e the index of the two knots between 
     # which the investigated value of grid_point is located.
@@ -71,11 +98,11 @@ class Spline():
 
     
     # Returns the relevant boor points given the relevant interval.
-    def find_boor_points(self, hot_interval) :
-        return np.matrix([[self.boor_points[hot_interval[0]-2,0], self.boor_points[hot_interval[0]-2, 1]],
-                          [self.boor_points[hot_interval[0]-1,0], self.boor_points[hot_interval[0]-1, 1]],
-                          [self.boor_points[hot_interval[0],0],   self.boor_points[hot_interval[0],   1]],
-                          [self.boor_points[hot_interval[0]+1,0], self.boor_points[hot_interval[0]+1, 1]]])
+    def find_boor_points(self, hot_interval, extended_boor_points) :
+        return np.matrix([[extended_boor_points[hot_interval[0]-2,0], extended_boor_points[hot_interval[0]-2, 1]],
+                          [extended_boor_points[hot_interval[0]-1,0], extended_boor_points[hot_interval[0]-1, 1]],
+                          [extended_boor_points[hot_interval[0],0],   extended_boor_points[hot_interval[0],   1]],
+                          [extended_boor_points[hot_interval[0]+1,0], extended_boor_points[hot_interval[0]+1, 1]]])
     
         
     # Finds the value of s(grid_point) recursively. Each function run determines the
@@ -94,9 +121,9 @@ class Spline():
             return relevant_boor_points
     
     # Plots the spline and occasionally the boor points.
-    def plot_spline(self, S, plot_boor):
+    def plot_spline(self, plot_boor):
         if plot_boor:
             plt.plot(self.boor_points[:,0], self.boor_points[:,1], 'ro--')
-        plt.plot(S[:,0], S[:,1])
+        plt.plot(self.S[:,0], self.S[:,1])
         plt.title("Looped spline: Cubic spline with its polynomial segments and it's control polygon")
-        plt.show()
+        #plt.show()
