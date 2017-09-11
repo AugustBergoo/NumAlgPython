@@ -20,8 +20,19 @@ def heaviside_a(x):
 # Define a function to calculate coefficient polynomials for the N's:
 def coef(u,u_knots,j,k):
     # u = np.linspace(u_knots[j-1],u_knots[j+4], num = 50)
-    c = np.array([((u-u_knots[j-1])/(u_knots[j+k-1]-u_knots[j-1])),((u_knots[j+k]-u)/(u_knots[j+k]-u_knots[j]))])
-    return c
+    try :
+        c1 = ((u-u_knots[j-1])/(u_knots[j+k-1]-u_knots[j-1]))
+    except ZeroDivisionError:
+        c1 = 0
+        print("c1 var 0")
+        
+    try :
+        c2 = ((u_knots[j+k]-u)/(u_knots[j+k]-u_knots[j]))
+    except ZeroDivisionError:
+        c2=0
+        print("c2 var 0")
+        
+    return np.array([c1,c2])
 
 
 # Define a function that computes basisfunction Nj(u), of degree k.
@@ -37,7 +48,7 @@ def basisfunc(u,u_knots,j,k):
 
 # Define a function that evaluates basisfunction over an interval u    
 def evalbasisfunc(u_knots,j,k):
-    u = np.linspace(u_knots[j-1],u_knots[j+3], num = 100)
+    u = np.linspace(u_knots[0],u_knots[-1], num = 100)
     N = np.zeros((1,len(u)))
     for i in range(len(u)):
         N[0,i] = basisfunc(u[i],u_knots,j,k)

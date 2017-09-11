@@ -20,7 +20,7 @@ class Spline():
         
         #Attributes
         self.u_knots = np.linspace(0, 1, np.size(points, 0))
-        #self.extend_u_knots()
+        self.extend_u_knots()
         
         if(not interpolation):
             # Attributes
@@ -28,25 +28,22 @@ class Spline():
             self.S = np.zeros((np.size(grid), 2))
             
             # Extends the lengths of the attributes.
-            self.extend_u_knots() 
             extended_boor_points = self.extend_boor_points()
             
             self.calc_spline(grid, extended_boor_points)  
         
         else:    
             interpolation_points = points
-            length = size(grid)
-            print(length)
-            xi = np.zeros((length, 1))
-            
-            for i in range(length-2):
-                xi[i] = (grid[i] + grid[i+1] + grid[i+2])
-            print(xi)
+            length = size(points)
+            xi = np.zeros((np.size(grid), 1))
+            print(np.size(grid))
+            for i in range(np.size(grid)-2):
+                xi[i] = (grid[i] + grid[i+1] + grid[i+2])/3
             
             vander_matrix = np.zeros((length,length))
             for i in range(length):
                 for j in range(length):
-                    vander_matrix[i,j] = bf.basisfunc(xi[i], self.u_knots, j, 3)
+                    vander_matrix[i,j] = self.basisfunc(xi[i], j+2, 3)
             print(vander_matrix)
             #boor_points = ...
             #return Spline(grid, boor_points)
@@ -156,3 +153,44 @@ class Spline():
         plt.plot(self.S[:,0], self.S[:,1])
         plt.title("Looped spline: Cubic spline with its polynomial segments and it's control polygon")
         #plt.show()
+
+
+    # Define Heaviside Function:
+    def heaviside_a(self,x):
+        if (x > 0):
+            result = 1
+        elif (x == 0):
+            result = 1
+        else:
+            result = 0
+        return result
+    
+    
+    # Define a function to calculate coefficient polynomials for the N's:
+    def coef(self,u,j,k):
+        # u = np.linspace(u_knots[j-1],u_knots[j+4], num = 50)
+        try :
+            c1 = ((u-self.u_knots[j-1])/(self.u_knots[j+k-1]-self.u_knots[j-1]))
+        except ZeroDivisionError:
+            c1 = 0
+            print("c1 var 0")
+            
+        try :
+            c2 = ((self.u_knots[j+k]-u)/(self.u_knots[j+k]-self.u_knots[j]))
+        except ZeroDivisionError:
+            c2=0
+            print("c2 var 0")
+            
+        return np.array([c1,c2])
+    
+    
+    # Define a function that computes basisfunction Nj(u), of degree k.
+    def basisfunc(self,u,j,k):
+        
+        if (k>0):
+            # If k>0, N is a function of N of lower degrees.  
+            N = self.coef(u,j,k)[0]*self.basisfunc(u,j,k-1) + self.coef(u,j,k)[1]*self.basisfunc(u,j+1,k-1) 
+        else:
+            # If k=0, N consists of Heavisides:
+            N = self.heaviside_a(u-self.u_knots[j-1]) - self.heaviside_a(u - self.u_knots[j])
+        return N;

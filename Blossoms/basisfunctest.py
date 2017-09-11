@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import basisfunc as bf
 
 # Give desired values to u_knots and constants:
-u_knots = np.array([0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.])
-j = 5
+u_knots = np.array([0.1,0.1,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.,1.,1.])
+j = 3
 k = 3
 
 # Evaluate the basis function:
