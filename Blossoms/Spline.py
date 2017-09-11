@@ -9,22 +9,51 @@ from  pylab import *
 
 import numpy as np
 import matplotlib.pyplot as plt
+import basisfunc as bf
 
 class Spline():
     
     # Acts as the Constructor and assigns the attributes.
-    def __init__(self, boor_points, grid):
-        # Attributes
-        self.u_knots = np.linspace(0, 1, np.size(boor_points, 0))
-        self.boor_points = boor_points
-        self.S = np.zeros((np.size(grid), 2))
+    def __init__(self, grid, points, interpolation=False):
+        if(grid == None or points == None or np.size(grid) == 0 or np.size(points) == 0):
+            raise ValueError("Size of grid or points is zero or None")
         
-        # Extends the lengths of the attributes.
-        self.extend_u_knots() 
-        extended_boor_points = self.extend_boor_points()
+        #Attributes
+        self.u_knots = np.linspace(0, 1, np.size(points, 0))
+        #self.extend_u_knots()
         
-        self.calc_spline(grid, extended_boor_points)  
-       
+        if(not interpolation):
+            # Attributes
+            self.boor_points = points
+            self.S = np.zeros((np.size(grid), 2))
+            
+            # Extends the lengths of the attributes.
+            self.extend_u_knots() 
+            extended_boor_points = self.extend_boor_points()
+            
+            self.calc_spline(grid, extended_boor_points)  
+        
+        else:    
+            interpolation_points = points
+            length = size(grid)
+            print(length)
+            xi = np.zeros((length, 1))
+            
+            for i in range(length-2):
+                xi[i] = (grid[i] + grid[i+1] + grid[i+2])
+            print(xi)
+            
+            vander_matrix = np.zeros((length,length))
+            for i in range(length):
+                for j in range(length):
+                    vander_matrix[i,j] = bf.basisfunc(xi[i], self.u_knots, j, 3)
+            print(vander_matrix)
+            #boor_points = ...
+            #return Spline(grid, boor_points)
+            
+     
+        
+        
     # Plots the spline, plot_boor is a boolean indicating whether the boor points should be 
     # plotted or not.
     def __call__(self, plot_boor=False):
@@ -40,12 +69,12 @@ class Spline():
         # splines' lengths are equal.
         if(length_1 >= length_2):
             boor = np.zeros((length_1, 2)) 
-            zero = zeros((length_1-length_2, 2))
+            zero = np.zeros((length_1-length_2, 2))
             spline.boor_points = np.concatenate([spline.boor_points, zero])
             
         elif(length_1 < length_2):
             boor = np.zeros((length_2, 2)) 
-            zero = zeros((length_2-length_1, 2))
+            zero = np.zeros((length_2-length_1, 2))
             self.boor_points = np.concatenate([self.boor_points, zero])
            
         # Creates a grid with the same size as the spline with most spline-points.
@@ -56,7 +85,7 @@ class Spline():
             boor[i,0] = self.boor_points[i,0] + spline.boor_points[i,0]
             boor[i,1] = self.boor_points[i,1] + spline.boor_points[i,1]
         
-        return Spline(boor, grid)
+        return Spline(grid, boor)
 
     # Calculates the whole spline point by point.
     def calc_spline(self, grid, extended_boor_points):       
