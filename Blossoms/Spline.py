@@ -8,6 +8,7 @@ from  scipy import *
 from  pylab import *
 
 import numpy as np
+import scipy as sp
 import matplotlib.pyplot as plt
 import basisfunc as bf
 
@@ -34,18 +35,26 @@ class Spline():
         
         else:    
             interpolation_points = points
-            length = size(points)
-            xi = np.zeros((np.size(grid), 1))
-            print(np.size(grid))
-            for i in range(np.size(grid)-2):
-                xi[i] = (grid[i] + grid[i+1] + grid[i+2])/3
+            nbr_points = len(points)
             
-            vander_matrix = np.zeros((length,length))
-            for i in range(length):
-                for j in range(length):
-                    vander_matrix[i,j] = self.basisfunc(xi[i], j+2, 3)
+            xi = np.zeros(nbr_points)
+            
+            for i in range(len(xi)):
+                xi[i] = (self.u_knots[i+1] + self.u_knots[i+2] + self.u_knots[i+3])/3
+                
+            print(xi)
+            vander_matrix = np.zeros((nbr_points, nbr_points))
+            
+            for i in range(0, nbr_points):
+                for j in range(0, nbr_points):
+                    vander_matrix[i, j] = self.basisfunc(xi[i], j+2, 3)
             print(vander_matrix)
-            #boor_points = ...
+            
+            
+            bp = sp.linalg.solve(vander_matrix, points)
+            splinetest = Spline(grid, bp)
+            splinetest(True)
+            plt.plot(points[:,0], points[:,1], 'go')
             #return Spline(grid, boor_points)
             
      
@@ -168,19 +177,17 @@ class Spline():
     
     # Define a function to calculate coefficient polynomials for the N's:
     def coef(self,u,j,k):
-        # u = np.linspace(u_knots[j-1],u_knots[j+4], num = 50)
-        try :
-            c1 = ((u-self.u_knots[j-1])/(self.u_knots[j+k-1]-self.u_knots[j-1]))
-        except ZeroDivisionError:
+       
+        if (self.u_knots[j+k-2]-self.u_knots[j-2]) == 0:
             c1 = 0
-            print("c1 var 0")
-            
-        try :
-            c2 = ((self.u_knots[j+k]-u)/(self.u_knots[j+k]-self.u_knots[j]))
-        except ZeroDivisionError:
-            c2=0
-            print("c2 var 0")
-            
+        else: 
+            c1 = ((u-self.u_knots[j-2])/(self.u_knots[j+k-2]-self.u_knots[j-2]))
+        
+        if (self.u_knots[j+k-1]-self.u_knots[j-1]) == 0:
+            c2 = 0
+        else:
+            c2 = ((self.u_knots[j+k-1]-u)/(self.u_knots[j+k-1]-self.u_knots[j-1]))
+
         return np.array([c1,c2])
     
     
@@ -192,5 +199,5 @@ class Spline():
             N = self.coef(u,j,k)[0]*self.basisfunc(u,j,k-1) + self.coef(u,j,k)[1]*self.basisfunc(u,j+1,k-1) 
         else:
             # If k=0, N consists of Heavisides:
-            N = self.heaviside_a(u-self.u_knots[j-1]) - self.heaviside_a(u - self.u_knots[j])
+            N = self.heaviside_a(u-self.u_knots[j-2]) - self.heaviside_a(u - self.u_knots[j-1])
         return N;
