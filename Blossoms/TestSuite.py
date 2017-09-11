@@ -17,7 +17,7 @@ class TestSuite(utest.TestCase) :
     def test_straight_line(self) :
         boor_points = np.array([[0,0], [1,0], [2,0], [3,0], [4,0], [5,0]])
         grid = np.linspace(0, 1, 100)
-        spline = spl.Spline(boor_points, grid)
+        spline = spl.Spline(grid, boor_points)
         for point in spline.S :
             self.assertEqual(point[1], 0)
 
@@ -25,7 +25,7 @@ class TestSuite(utest.TestCase) :
         boor_points = np.array([[-1,-1], [-2,-2], [-3,-3], [-4,-4], 
                                 [-5,-5]])
         grid = np.linspace(0, 1, 100)
-        spline = spl.Spline(boor_points, grid)
+        spline = spl.Spline(grid, boor_points)
         for point in spline.S :
             self.assertTrue(point[0] < 0)
             self.assertTrue(point[1] < 0)
@@ -35,21 +35,21 @@ class TestSuite(utest.TestCase) :
         grid = np.linspace(0, 1, 100)
         
         with self.assertRaises(ValueError) :
-            spl.Spline(boor_points, grid)
+            spl.Spline(grid, boor_points)
     
     def test_empty_grid(self) :
         boor_points = np.array([[0,0], [1,0], [2,0], [3,0], [4,0], [5,0]])
         grid = np.array([])
         
         with self.assertRaises(ValueError) :
-            spl.Spline(boor_points, grid)
+            spl.Spline(grid, boor_points)
             
     def test_add(self) :
         b1 = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5]])
         b2 = np.array([[0,0], [1,-1], [2,-2], [3,-3], [4,-4], [5,-5]])
         grid = np.linspace(0, 1, 100)
-        spline1 = spl.Spline(b1, grid)
-        spline2 = spl.Spline(b2, grid)
+        spline1 = spl.Spline(grid, b1)
+        spline2 = spl.Spline(grid, b2)
         spline3 = spline1 + spline2
         
         for point in spline3.S :
@@ -59,8 +59,8 @@ class TestSuite(utest.TestCase) :
         b1 = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5], [6,0], [7,0]])
         b2 = np.array([[0,0], [1,-1], [2,-2], [3,-3], [4,-4], [5,-5]])
         grid = np.linspace(0, 1, 100)
-        spline1 = spl.Spline(b1, grid)
-        spline2 = spl.Spline(b2, grid)
+        spline1 = spl.Spline(grid, b1)
+        spline2 = spl.Spline(grid, b2)
         spline3 = spline1 + spline2
         
         for point in spline3.S :
@@ -70,8 +70,8 @@ class TestSuite(utest.TestCase) :
         boor_points = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5]])
         grid1 = np.linspace(0, 1, 100)
         grid2 = np.linspace(0, 1, 50)
-        spline1 = spl.Spline(boor_points, grid1)
-        spline2 = spl.Spline(boor_points, grid2)
+        spline1 = spl.Spline(grid1, boor_points)
+        spline2 = spl.Spline(grid2, boor_points)
         spline3 = spline1 + spline2
         
         self.assertEqual(np.size(spline3.S, 0), np.size(grid1) if 
@@ -81,8 +81,8 @@ class TestSuite(utest.TestCase) :
         b1 = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5]])
         b2 = np.array([[0,0], [1,-1], [2,-2], [3,-3], [4,-4], [5,-5]])
         grid = np.linspace(0, 1, 100)
-        spline1 = spl.Spline(b1, grid)
-        spline2 = spl.Spline(b2, grid)
+        spline1 = spl.Spline(grid, b1)
+        spline2 = spl.Spline(grid, b2)
         spline3 = spline1 + spline2
         spline4 = spline2 + spline1
         
@@ -91,18 +91,17 @@ class TestSuite(utest.TestCase) :
             self.assertEqual(spline3.S[i,1], spline4.S[i,1])
             
     def test_basis_sum(self) :
-        # TODO: Here we have a lot of hardcoded constants, but basisfunc.py is
-        # written so we cannot test in an other way.
-        u_knots = np.arange(0, 1.1, 0.1)
         k = 3
+        grid = np.linspace(0, 1, 100)
+        boor_points = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5]])
+        s = spl.Spline(grid, boor_points)
         
-        all_bases = np.zeros((1,100))
-        for i in range(1, 101) :
-            [u,N] = bf.evalbasisfunc(u_knots, i, k)
-            all_bases += N
-        
-        for point in all_bases :
-            self.assertEqual(point[0], 1)
+        u_array = np.linspace(s.u_knots[3], s.u_knots[-4]) # Tests 50 values of u.
+        for u in u_array :
+            base_sum = 0
+            for j in range(2,len(s.u_knots)-2) : # Iterate over each base function.
+                base_sum += s.basisfunc(u, j, k)
+            self.assertAlmostEqual(base_sum, 1) # Test if the sum is equal to 1.
             
             
         
