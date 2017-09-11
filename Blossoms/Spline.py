@@ -57,6 +57,14 @@ class Spline():
             plt.plot(points[:,0], points[:,1], 'go')
             #return Spline(grid, boor_points)
             
+            self.boor_points = bp
+            self.S = np.zeros((np.size(grid), 2))
+            
+            # Extends the lengths of the attributes.
+            extended_boor_points = self.extend_boor_points()
+            
+            self.calc_spline(grid, extended_boor_points) 
+            
      
         
         
