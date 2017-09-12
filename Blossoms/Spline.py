@@ -2,7 +2,7 @@
 """
 Created on Mon Sep  4 12:55:24 2017
 Last updated on 2017-09-07 16.01
-@author: Axel, Simon, August
+@author: Axel, Simon, August, Gustav, Erik
 """
 from  scipy import *
 from  pylab import *
@@ -10,7 +10,7 @@ from  pylab import *
 import numpy as np
 import scipy as sp
 import matplotlib.pyplot as plt
-import basisfunc as bf
+
 
 class Spline():
     
@@ -23,18 +23,7 @@ class Spline():
         self.u_knots = np.linspace(0, 1, np.size(points, 0))
         self.extend_u_knots()
         
-        if(not interpolation):
-            # Attributes
-            self.boor_points = points
-            self.S = np.zeros((np.size(grid), 2))
-            
-            # Extends the lengths of the attributes.
-            extended_boor_points = self.extend_boor_points()
-            
-            self.calc_spline(grid, extended_boor_points)  
-        
-        else:    
-            interpolation_points = points
+        if interpolation:
             nbr_points = len(points)
             
             xi = np.zeros(nbr_points)
@@ -42,28 +31,32 @@ class Spline():
             for i in range(len(xi)):
                 xi[i] = (self.u_knots[i+1] + self.u_knots[i+2] + self.u_knots[i+3])/3
                 
-            print(xi)
+            #print(xi)
             vander_matrix = np.zeros((nbr_points, nbr_points))
             
             for i in range(0, nbr_points):
                 for j in range(0, nbr_points):
                     vander_matrix[i, j] = self.basisfunc(xi[i], j+2, 3)
-            print(vander_matrix)
-            
+            #print(vander_matrix)
             
             bp = sp.linalg.solve(vander_matrix, points)
+            
+            # Hack for showing the interpolation spline with its interpolation points.
             splinetest = Spline(grid, bp)
-            splinetest(True)
             plt.plot(points[:,0], points[:,1], 'go')
-            #return Spline(grid, boor_points)
+            splinetest(True)
+            points = bp
             
-            self.boor_points = bp
-            self.S = np.zeros((np.size(grid), 2))
-            
-            # Extends the lengths of the attributes.
-            extended_boor_points = self.extend_boor_points()
-            
-            self.calc_spline(grid, extended_boor_points) 
+
+        # Attributes
+        self.boor_points = points
+        self.S = np.zeros((np.size(grid), 2))
+        
+        # Extends the lengths of the attributes.
+        extended_boor_points = self.extend_boor_points()
+        
+        self.calc_spline(grid, extended_boor_points)  
+
             
      
         
@@ -168,8 +161,8 @@ class Spline():
         if plot_boor:
             plt.plot(self.boor_points[:,0], self.boor_points[:,1], 'ro--')
         plt.plot(self.S[:,0], self.S[:,1])
-        plt.title("Looped spline: Cubic spline with its polynomial segments and it's control polygon")
-        #plt.show()
+        plt.title("Cubic spline with its polynomial segments and it's control polygon")
+        plt.show()
 
 
     # Define Heaviside Function:
