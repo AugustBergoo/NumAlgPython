@@ -95,12 +95,16 @@ class TestSuite(utest.TestCase) :
         grid = np.linspace(0, 1, 100)
         boor_points = np.array([[0,0], [1,1], [2,2], [3,3], [4,4], [5,5]])
         s = spl.Spline(grid, boor_points)
-        
+        print('u_knots = {}' .format(s.u_knots))
         u_array = np.linspace(s.u_knots[3], s.u_knots[-4]) # Tests 50 values of u.
+        print('u_array = {}' .format(u_array))
         for u in u_array :
+            print('u = {}' .format(u))
             base_sum = 0
             for j in range(2,len(s.u_knots)-2) : # Iterate over each base function.
                 base_sum += s.basisfunc(u, j, k)
+                print('basisfunc{} = {}' .format(j-2, s.basisfunc(u, j, k)))
+            print('base_sum = {}' .format(base_sum))
             self.assertAlmostEqual(base_sum, 1) # Test if the sum is equal to 1.
             
             
