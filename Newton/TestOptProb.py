@@ -21,16 +21,16 @@ import numpy as np
 
 # problem1.solve(x0, tol, 'BadBroyden', 'Exact')
 
+def f(x):
+    return np.array(x**3)
 
+def grad(x):
+    return np.array(3*x**2)
 
 problem1 = OptimizationProblem(f, grad)
-tol = 1e-3
-x0 = np.array([5])
+tol = 1e-5
+x0 = np.array([0.01])
 problem1.solve(x0, tol, 'ClassicNewton')
 
 
-def f(x):
-    return np.array([x**2])
 
-def grad(x):
-    return np.array([2*x])

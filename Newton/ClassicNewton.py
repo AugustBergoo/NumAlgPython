@@ -20,11 +20,10 @@ class ClassicNewton(GenericNewton):
         super(ClassicNewton, self).__init__(tol)
         self.objFunc = objFunc  #Oanvänd, så jag kanske inte ska ha denna raden kod.
         self.objGrad = objGrad
-
         
     
     def step(self, xk):
-        delta_x = 0.01 #Ska vi ha detta som inparameter?
+        delta_x = 1 #Ska vi ha detta som inparameter?
         
         # Create empty Hessian
         H = np.zeros((np.size(xk),np.size(xk)))
@@ -48,7 +47,7 @@ class ClassicNewton(GenericNewton):
         G = (1/2)*(H + H.transpose())
         
         # Test om G är pos. def. Raise exception if not:
-        #is_pd(G)
+        is_pd(G)
         
         # Apply choleskys method to turn G into an (upper) trangle matrix.
         A = sl.cholesky(G)
