@@ -37,26 +37,41 @@ class QuasiNewton(GenericNewton):
         alpha = linesearch(xk, s_k, self.objFunc, self.objGrad)
         xnext = xk + aplha*s_k
         #C)
-        self.H_k = self.updateB(xk,xnext)
+        delta = xnext-xk
+        gamma = self.objGrad(xnext)-self.objGrad(xk)
+        self.H_k = self.updateB(delta,gamma)
    
     # Check if possible to make an abstract updateB method.
         
-
+# The following classes approximates the next hessian or hessian inverse.
+# Delta is the steplenght of the current step, and gamma is the change in 
+# gradient of the same step.
 class GoodBroyden(QuasiNewton):
     def updateB(self,xk,xnext): 
         return
 
 class BadBroyden(QuasiNewton):
-    def updateB(self,xk,xnext): 
-        pass
+    def updateB(self,delta,gamma): 
+        u = delta-(self.H_k*gamma)
+        a = 1/(np.transpose(u)*gamma)
+        return self.H_k+(a*u*np.transpose(u))
 
 class DFP(QuasiNewton):
-    def updateB(self,xk,xnext): 
-        pass
+    def updateB(self,delta,gamma):
+        deltaT = np.transpose(delta)
+        gammaT = np.transpose(gamma)
+        term1 = self.H_k+(delta*deltaT/((deltaT)*gamma))
+        term2 = (self.H_k*gamma*gammaT*self.H_k)/(gammaT*self.H_k*gamma)
+        return term1 - term2
+    
+    
+    
+    
 
 class BFGS(QuasiNewton):
-    def updateB(self,xk,xnext): 
-        pass
+    def updateB(self,delta,gamma): 
+        return self.H_k + (1 + gamma.t*self.H_k*gamma/((delta.t)*gamma))*((delta*(delta.t))/((delta.t)*gamma)- (delta*(gamma.t)*self.H_k + self.H_k*gamma*(delta.t))/(delta*(delta.t))
+        
     
     
     
