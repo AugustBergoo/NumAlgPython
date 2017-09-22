@@ -30,14 +30,14 @@ class OptimizationProblem():
     def solve(self, x0, tol, method, linesearchMethod = None):
          
         # LinesearchMethods = 'Inexact' and 'Exact'
-#        if linesearchMethod is not None:
-#            if linesearchMethod == 'Exact':
-#                linesearch = Linesearch.inexactLinesearch
-#            elif linesearchMethod == 'Inexact':
-#                linesearch = Linesearch.exactLinesearch
-#            else:
-#                raise ValueError('The specified linesearch is invalid')
-#        
+        if linesearchMethod is not None:
+            if linesearchMethod == 'Exact':
+                linesearch = Linesearch.inexactLinesearch
+            elif linesearchMethod == 'Inexact':
+                linesearch = Linesearch.exactLinesearch
+            else:
+                raise ValueError('The specified linesearch is invalid')
+        
         # Finds the dimension of the problem
         dim = np.size(x0)
         
@@ -46,16 +46,16 @@ class OptimizationProblem():
             problem = ClassicNewton(self.objFunc, self.objGrad, tol)            
         
         elif method == 'GoodBroyden':
-            problem = GoodBroyden(self.objFunc, self.objGrad, linesearchMethod, tol, dim) 
+            problem = GoodBroyden(self.objFunc, self.objGrad, linesearch, tol, dim) 
         
         elif method == 'BadBroyden':
-            problem = BadBroyden(self.objFunc, self.objGrad, linesearchMethod, tol, dim) 
+            problem = BadBroyden(self.objFunc, self.objGrad, linesearch, tol, dim) 
         
         elif method == 'DFP':
-            problem = DFP(self.objFunc, self.objGrad, linesearchMethod, tol, dim)
+            problem = DFP(self.objFunc, self.objGrad, linesearch, tol, dim)
         
         elif method == 'BFGS':
-            problem = BFGS(self.objFunc, self.objGrad, linesearchMethod, tol, dim)
+            problem = BFGS(self.objFunc, self.objGrad, linesearch, tol, dim)
 #        
         else:
             raise ValueError('The specified method is invalid')

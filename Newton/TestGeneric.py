@@ -22,5 +22,4 @@ x0=np.array([1.5])
 tol=0.001
 
 problemPol = OptimizationProblem(esyPol,esyPolGrad)
-linesearchMethod = Linesearch()
-problemPol.solve(x0, tol, "DFP", linesearchMethod.exactLinesearch)
+problemPol.solve(x0, tol, "DFP", "Exact")
