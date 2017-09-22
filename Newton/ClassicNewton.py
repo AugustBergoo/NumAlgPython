@@ -32,14 +32,17 @@ class ClassicNewton(GenericNewton):
         # increased by delta_x (used in finite difference)"
         delta_xk = np.zeros((np.size(xk),np.size(xk)))
         for i in range(np.size(xk)):
-            vec = np.zeros(np.size(xk))
+            vec = np.zeros((np.size(xk), 1))
             vec[i] = delta_x
-            delta_xk[i,:] = xk + delta_x*vec
+            #temp = delta_x * vec
+            #delta_xk[0,i] = xk[0] + temp[0]
+            #delta_xk[1,i] = xk[1] + temp[1]
+            delta_xk[:,i] = xk[:,0] + delta_x * vec[:,0]
             
         # Calc values of Hessian by finite differences:
         for i in range(np.size(xk)):
             for j in range(np.size(xk)):
-                grad1 = self.objGrad(xk + delta_xk[j,:])
+                grad1 = self.objGrad(xk[:,0] + delta_xk[:,j])
                 grad2 = self.objGrad(xk)
                 H[i,j] = (grad1[j] - grad2[j]) / delta_x
         
@@ -63,7 +66,6 @@ def is_pd(K):
     try:
         np.linalg.cholesky(K)
         return 1 
-    except np.linalg.linalg.LinAlgError as err:
+    except np.linalg.LinAlgError as err:
         if 'Matrix is not positive definite' in err.message:
             return 0
-    raise ValueError('Something')
