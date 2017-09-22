@@ -17,7 +17,7 @@ class ClassicNewton(GenericNewton):
     def __init__(self, objFunc, objGrad, tol):
         self.objFunc = objFunc  #Oanvänd, så jag kanske inte ska ha denna raden kod.
         self.objGrad = objGrad
-        super(tol)
+         super(ClassicNewton, self).__init__(tol)
 
         
     
