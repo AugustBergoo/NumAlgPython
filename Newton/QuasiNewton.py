@@ -51,28 +51,24 @@ class QuasiNewton(GenericNewton):
 # gradient of the same step.
 class GoodBroyden(QuasiNewton):
     def updateB(self,delta,gamma):
-        return self.H_k + (delta -self.H_k@gamma)@np.transpose(delta)@self.H_k/(np.transpose(delta)@self.H_k@gamma)
+        return self.H_k + (delta -self.H_k@gamma)@delta.T@self.H_k/(delta.T@self.H_k@gamma)
 
 class BadBroyden(QuasiNewton):
     def updateB(self,delta,gamma): 
-        return self.H_k+(delta -self.H_k@gamma)@np.transpose(gamma)/(np.transpose(gamma)@gamma)
+        return self.H_k+(delta -self.H_k@gamma)@gamma.T/(gamma.T@gamma)
 
 class DFP(QuasiNewton):
     def updateB(self,delta,gamma):
-        deltaT = np.transpose(delta)
-        gammaT = np.transpose(gamma)
-        term1 = self.H_k+(delta@deltaT/((deltaT)@gamma))
-        term2 = (self.H_k@gamma@gammaT*self.H_k)/(gammaT@self.H_k@gamma)
+        term1 = self.H_k+(delta@delta.T/((delta.T)@gamma))
+        term2 = (self.H_k@gamma@gamma.T*self.H_k)/(gamma.T@self.H_k@gamma)
         return term1 - term2    
     
 
 class BFGS(QuasiNewton):
     def updateB(self,delta,gamma): 
-        deltaT = np.transpose(delta)
-        gammaT = np.transpose(gamma)
         dTg = np.transpose(delta)@gamma
-        term1 = self.H_k + (1 + gammaT@self.H_k@gamma/dTg)*(delta@deltaT)/dTg
-        term2 = (delta@gammaT@self.H_k + self.H_k@gamma@deltaT)/dTg
+        term1 = self.H_k + (1 + gamma.T@self.H_k@gamma/dTg)*(delta@delta.T)/dTg
+        term2 = (delta@gamma.T@self.H_k + self.H_k@gamma@delta.T)/dTg
         return term1 - term2
         
     # Oklar Broydenmetod
