@@ -21,7 +21,7 @@ class GenericNewton():
         
         # itr is the amount of steps the loop will run before stopping, if 
         # the tolerance is not met.
-        itr = 10000
+        itr = 1000
         for i in range(itr):       
             xk1 = xk - self.step(xk)
             dx = np.linalg.norm(xk1 - xk)

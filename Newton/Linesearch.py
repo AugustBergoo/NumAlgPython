@@ -19,13 +19,15 @@ class Linesearch():
         lamb = 2 # Initial guess for lambda.
         
         def T(x):
-            return func(xk) + epsilon*x*grad(xk)
+            return func(xk) + epsilon*x*grad(xk).T@dk
         
-        while func(xk + lamb*dk) > T(lamb) and func(xk + alpha*lamb*dk) < T(alpha*lamb):
+        while func(xk + lamb*dk) > T(lamb) or func(xk + alpha*lamb*dk) < T(alpha*lamb):
+            
             if func(xk + lamb*dk) > T(lamb): # The step was too large
                 lamb /= alpha
             else: # The step was too small.
                 lamb *= alpha
+            
         
         return lamb
         
@@ -33,27 +35,25 @@ class Linesearch():
     def exactLinesearch(xk, dk, func, grad):
         """The bisection method"""
         a = 0 # Lower interval.
-        b0 = 10 # Upper interval.
+        b0 = 10e99 # Upper interval.
         b = b0
-        tol = 0.001
+        tol = 0.00001
         itrMax = 100000
 
         old_lamb = 0
         for i in range(itrMax):
             lamb = (a + b) / 2
-            if (grad(xk + lamb*dk) <= 0):
+            gradNum = grad(xk+lamb*dk)
+            
+            if (gradNum.T@dk <= 0):
                 a = lamb
             else:
                 b = lamb
                 
             if abs(old_lamb - lamb) < tol:
-                if b0 - b < tol:
-                    a = b0
-                    b = b0 + 10
-                    b0 = b0 + 10
-                else:
-                    break
+                break
             old_lamb = lamb
+            
         
         return lamb
         

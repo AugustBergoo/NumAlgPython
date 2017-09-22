@@ -41,8 +41,9 @@ class QuasiNewton(GenericNewton):
         delta = xnext-xk
         gamma = self.objGrad(xnext)-self.objGrad(xk)
         self.H_k = self.updateB(delta,gamma)
+        print(self.H_k)
         
-        return xnext
+        return -delta
    
     # Check if possible to make an abstract updateB method.
         
@@ -51,24 +52,27 @@ class QuasiNewton(GenericNewton):
 # gradient of the same step.
 class GoodBroyden(QuasiNewton):
     def updateB(self,delta,gamma):
-        return self.H_k + (delta -self.H_k@gamma)@delta.T@self.H_k/(delta.T@self.H_k@gamma)
+        return self.H_k + np.outer((delta -self.H_k@gamma),delta)@self.H_k/(delta@self.H_k@gamma)
 
 class BadBroyden(QuasiNewton):
     def updateB(self,delta,gamma): 
-        return self.H_k+(delta -self.H_k@gamma)@gamma.T/(gamma.T@gamma)
+        return self.H_k+np.outer((delta -self.H_k@gamma),gamma)/(gamma@gamma)
 
 class DFP(QuasiNewton):
     def updateB(self,delta,gamma):
-        term1 = self.H_k+(delta@delta.T/((delta.T)@gamma))
-        term2 = (self.H_k@gamma@gamma.T*self.H_k)/(gamma.T@self.H_k@gamma)
+        term1 = self.H_k+(np.outer(delta,delta)/(delta@gamma))
+        term2 = (self.H_k@np.outer(gamma,gamma)@self.H_k)/(gamma@self.H_k@gamma)
         return term1 - term2    
     
 
 class BFGS(QuasiNewton):
     def updateB(self,delta,gamma): 
-        dTg = np.transpose(delta)@gamma
-        term1 = self.H_k + (1 + gamma.T@self.H_k@gamma/dTg)*(delta@delta.T)/dTg
-        term2 = (delta@gamma.T@self.H_k + self.H_k@gamma@delta.T)/dTg
+        print("delta: ",np.shape(np.transpose(delta)), "gamma: ",np.shape(gamma))
+        print("delta@gamma.T: ",delta@gamma.T)
+        dTg = delta@gamma
+        
+        term1 = self.H_k + (1 + gamma@self.H_k@gamma/dTg)*(np.outer(delta,delta)/dTg)
+        term2 = (np.outer(delta,gamma)@self.H_k + self.H_k@np.outer(gamma,delta)/dTg)
         return term1 - term2
         
     # Oklar Broydenmetod
