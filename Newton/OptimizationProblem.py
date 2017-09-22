@@ -62,6 +62,7 @@ class OptimizationProblem():
         
         
         # Solves the problem
-        problem.findMin(x0)
+        minimum = problem.findMin(x0)
+        print('Value:', float(self.objFunc(minimum)))
         
     
