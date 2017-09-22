@@ -9,6 +9,7 @@ Created on Wed Sep 20 15:52:34 2017
 from scipy import *
 from pylab import *
 import numpy as np
+import GenericNewton
 
 class QuasiNewton(GenericNewton):
     # Assume we input objFunc and objGrad as pyton functions. E.g objFunc(xk) 
@@ -49,14 +50,12 @@ class QuasiNewton(GenericNewton):
 # Delta is the steplenght of the current step, and gamma is the change in 
 # gradient of the same step.
 class GoodBroyden(QuasiNewton):
-    def updateB(self,xk,xnext): 
-        return
+    def updateB(self,delta,gamma):
+        return self.H_k + (delta -self.H_k@gamma)@np.transpose(delta)@self.H_k/(np.transpose(delta)@self.H_k@gamma)
 
 class BadBroyden(QuasiNewton):
     def updateB(self,delta,gamma): 
-        u = delta-(self.H_k@gamma)
-        a = 1/(np.transpose(u)@gamma)
-        return self.H_k+(a*u@np.transpose(u))
+        return self.H_k+(delta -self.H_k@gamma)@np.transpose(gamma)/(np.transpose(gamma)@gamma)
 
 class DFP(QuasiNewton):
     def updateB(self,delta,gamma):
@@ -69,10 +68,18 @@ class DFP(QuasiNewton):
 
 class BFGS(QuasiNewton):
     def updateB(self,delta,gamma): 
-                deltaT = np.transpose(delta)
+        deltaT = np.transpose(delta)
         gammaT = np.transpose(gamma)
         dTg = np.transpose(delta)@gamma
         term1 = self.H_k + (1 + gammaT@self.H_k@gamma/dTg)*(delta@deltaT)/dTg
         term2 = (delta@gammaT@self.H_k + self.H_k@gamma@deltaT)/dTg
         return term1 - term2
         
+    # Oklar Broydenmetod
+#==============================================================================
+#     class BadBroyden(QuasiNewton):
+#     def updateB(self,delta,gamma): 
+#         u = delta-(self.H_k@gamma)
+#         a = 1/(np.transpose(u)@gamma)
+#         return self.H_k+(a*u@np.transpose(u))
+#==============================================================================
