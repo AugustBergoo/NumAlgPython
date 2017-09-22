@@ -12,18 +12,14 @@ import numpy as np
 
 class Linesearch():
     
-    def makeT(self,func, grad, epsilon,xk):
-        def T(step):
-            return func(xk) + epsilon*step*grad(xk)
-        return T
-    
-    def inexactLinesearch(self, xk, dk, func, grad): # Notation: see Antoniou Lu pp.112
+    def inexactLinesearch(xk, dk, func, grad): # Notation: see Antoniou Lu pp.112
         """Armijo's rule"""
         epsilon = 0.25
         alpha = 2 
         lamb = 2 # Initial guess for lambda.
         
-        T = self.makeT(func, grad, epsilon,xk)
+        def T(x):
+            return func(xk) + epsilon*x*grad(xk)
         
         while func(xk + lamb*dk) > T(lamb) and func(xk + alpha*lamb*dk) < T(alpha*lamb):
             if func(xk + lamb*dk) > T(lamb): # The step was too large
@@ -34,31 +30,29 @@ class Linesearch():
         return lamb
         
     
-    def exactLinesearch(self, xk, dk, func, grad):
+    def exactLinesearch(xk, dk, func, grad):
         """The bisection method"""
         a = 0 # Lower interval.
-        b = 2 # Upper interval.
+        b0 = 10 # Upper interval.
+        b = b0
         tol = 0.001
+        itrMax = 100000
 
-        # Find the upper interval by using parts of Armijo's rule.
-        epsilon = 0.25
-        alpha = 2
-        T = self.makeT(func, grad, epsilon,xk)
-        
-        while func(xk + alpha*b*dk) < T(alpha*b):
-            print(func(xk + alpha*b*dk),T(alpha*b))
-            b *= alpha
-        
-        d_lamb = tol + 1
         old_lamb = 0
-        while d_step > tol:
+        for i in range(itrMax):
             lamb = (a + b) / 2
             if (grad(xk + lamb*dk) <= 0):
                 a = lamb
             else:
                 b = lamb
-            
-            d_lamb = abs(old_lamb - lamb)
+                
+            if abs(old_lamb - lamb) < tol:
+                if b0 - b < tol:
+                    a = b0
+                    b = b0 + 10
+                    b0 = b0 + 10
+                else:
+                    break
             old_lamb = lamb
         
         return lamb
