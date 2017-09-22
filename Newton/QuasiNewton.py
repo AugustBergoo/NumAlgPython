@@ -9,7 +9,7 @@ Created on Wed Sep 20 15:52:34 2017
 from scipy import *
 from pylab import *
 import numpy as np
-import GenericNewton
+from GenericNewton import GenericNewton
 
 class QuasiNewton(GenericNewton):
     # Assume we input objFunc and objGrad as pyton functions. E.g objFunc(xk) 
@@ -18,12 +18,12 @@ class QuasiNewton(GenericNewton):
     
     # We start by setting the Hessian to the unit matrix. This was legit
     # according to the literature...
-    def __init__(self, objFunc, objGrad, linesearch, tol, initialGuess):
+    def __init__(self, objFunc, objGrad, linesearch, tol, dim):
         super(QuasiNewton, self).__init__(tol)
         self.objFunc = objFunc
         self.objGrad = objGrad
         self.linesearch = linesearch
-        self.H_k = np.eye(len(initialGuess))
+        self.H_k = np.eye(dim)
         
     
     # Structure of the step method:
@@ -35,8 +35,8 @@ class QuasiNewton(GenericNewton):
         g_k = self.objGrad(xk)
         s_k = -self.H_k@g_k
         #B)
-        alpha = linesearch(xk, s_k, self.objFunc, self.objGrad)
-        xnext = xk + aplha*s_k
+        alpha = self.linesearch(xk, s_k, self.objFunc, self.objGrad)
+        xnext = xk + alpha*s_k
         #C)
         delta = xnext-xk
         gamma = self.objGrad(xnext)-self.objGrad(xk)

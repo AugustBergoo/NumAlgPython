@@ -12,13 +12,18 @@ import numpy as np
 
 class Linesearch():
     
+    def makeT(self,func, grad, epsilon,xk):
+        def T(step):
+            return func(xk) + epsilon*step*grad(xk)
+        return T
+    
     def inexactLinesearch(self, xk, dk, func, grad): # Notation: see Antoniou Lu pp.112
-    """Armijo's rule"""
+        """Armijo's rule"""
         epsilon = 0.25
         alpha = 2 
         lamb = 2 # Initial guess for lambda.
         
-        T = __make_T(func, grad, epsilon)
+        T = self.makeT(func, grad, epsilon,xk)
         
         while func(xk + lamb*dk) > T(lamb) and func(xk + alpha*lamb*dk) < T(alpha*lamb):
             if func(xk + lamb*dk) > T(lamb): # The step was too large
@@ -38,8 +43,10 @@ class Linesearch():
         # Find the upper interval by using parts of Armijo's rule.
         epsilon = 0.25
         alpha = 2
-        T = __make_T(func, grad, epsilon)
+        T = self.makeT(func, grad, epsilon,xk)
+        
         while func(xk + alpha*b*dk) < T(alpha*b):
+            print(func(xk + alpha*b*dk),T(alpha*b))
             b *= alpha
         
         d_lamb = tol + 1
@@ -58,9 +65,6 @@ class Linesearch():
         
     
     
-    def __make_T(func, grad, epsilon):
-        def T(step):
-            return func(xk) + epsilon*step*grad(xk)
-        return T
+
     
     

@@ -11,13 +11,13 @@ from pylab import *
 
 import numpy as np
 
-#from QuasiNewton import GoodBroyden
-#from QuasiNewton import BadBroyden
-#from QuasiNewton import DFP
-#from QuasiNewton import BFGS
+from QuasiNewton import GoodBroyden
+from QuasiNewton import BadBroyden
+from QuasiNewton import DFP
+from QuasiNewton import BFGS
 
-#from Linesearch import Linesearch
-#from GenericNewton import GenericNewton
+from Linesearch import Linesearch
+from GenericNewton import GenericNewton
 from ClassicNewton import ClassicNewton
 
 
@@ -44,18 +44,18 @@ class OptimizationProblem():
         # Methods = 'ClassicNewton', 'GoodBroyden', 'BadBroyden', 'DFP' and 'BFGS'
         if method == 'ClassicNewton':
             problem = ClassicNewton(self.objFunc, self.objGrad, tol)            
-#        
-#        elif method == 'GoodBroyden':
-#            problem = GoodBroyden(self.objFunc, self.objGrad, linesearch, tol, dim) 
-#        
-#        elif method == 'BadBroyden':
-#            problem = BadBroyden(self.objFunc, self.objGrad, linesearch, tol, dim) 
-#        
-#        elif method == 'DFP':
-#            problem = DFP(self.objFunc, self.objGrad, linesearch, tol, dim)
-#        
-#        elif method == 'BFGS':
-#            problem = BFGS(self.objFunc, self.objGrad, linesearch, tol, dim)
+        
+        elif method == 'GoodBroyden':
+            problem = GoodBroyden(self.objFunc, self.objGrad, linesearchMethod, tol, dim) 
+        
+        elif method == 'BadBroyden':
+            problem = BadBroyden(self.objFunc, self.objGrad, linesearchMethod, tol, dim) 
+        
+        elif method == 'DFP':
+            problem = DFP(self.objFunc, self.objGrad, linesearchMethod, tol, dim)
+        
+        elif method == 'BFGS':
+            problem = BFGS(self.objFunc, self.objGrad, linesearchMethod, tol, dim)
 #        
         else:
             raise ValueError('The specified method is invalid')
