@@ -32,9 +32,9 @@ class OptimizationProblem():
         # LinesearchMethods = 'Inexact' and 'Exact'
         if linesearchMethod is not None:
             if linesearchMethod == 'Exact':
-                linesearch = Linesearch.inexactLinesearch
-            elif linesearchMethod == 'Inexact':
                 linesearch = Linesearch.exactLinesearch
+            elif linesearchMethod == 'Inexact':
+                linesearch = Linesearch.inexactLinesearch
             else:
                 raise ValueError('The specified linesearch is invalid')
         
