@@ -32,19 +32,13 @@ class ClassicNewton(GenericNewton):
         # increased by delta_x (used in finite difference)"
         delta_xk = np.zeros((np.size(xk),np.size(xk)))
         for i in range(np.size(xk)):
-            delta_xk[i][i] = delta_x
+            delta_xk[i,i] = delta_x
             
         
         # Calc values of Hessian by finite differences:
         for i in range(np.size(xk)):
             for j in range(np.size(xk)):
-                
-                # Adding column vectors
-                col = np.zeros((np.size(xk),1))
-                for m in range(np.size(xk)):
-                    col[m] = delta_xk[m,i]
-                
-                grad1 = self.objGrad(xk + col)
+                grad1 = self.objGrad(xk + delta_xk[i,:])
                 grad2 = self.objGrad(xk)
                 H[i, j] = (grad1[j] - grad2[j]) / delta_x
         

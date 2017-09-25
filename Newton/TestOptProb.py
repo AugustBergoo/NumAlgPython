@@ -42,8 +42,8 @@ def grad3d(x):
 
 tol = 1e-5
 x0 = np.array([5])
-x02d = np.array([[20, 2]]).T
-x03d = np.array([[20, 2, 30]]).T
+x02d = np.array([20, 2])
+x03d = np.array([20, 2, 30])
 
 problem1 = OptimizationProblem(f, grad)
 problem1.solve(x0, tol, 'ClassicNewton')
