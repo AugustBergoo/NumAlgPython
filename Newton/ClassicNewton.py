@@ -23,7 +23,7 @@ class ClassicNewton(GenericNewton):
         
     
     def step(self, xk):
-        delta_x = 1 #Ska vi ha detta som inparameter?
+        delta_x = 0.01 #Ska vi ha detta som inparameter?
         
         # Create empty Hessian
         H = np.zeros((np.size(xk),np.size(xk)))
@@ -32,16 +32,22 @@ class ClassicNewton(GenericNewton):
         # increased by delta_x (used in finite difference)"
         delta_xk = np.zeros((np.size(xk),np.size(xk)))
         for i in range(np.size(xk)):
-            vec = np.zeros((np.size(xk), 1))
-            vec[i] = delta_x
-            delta_xk[:,i] = xk[:,0] + delta_x * vec[:,0]
+            delta_xk[i][i] = delta_x
             
+        
         # Calc values of Hessian by finite differences:
         for i in range(np.size(xk)):
             for j in range(np.size(xk)):
-                grad1 = self.objGrad(xk[:,0] + delta_xk[:,j])
+                
+                # Adding column vectors
+                col = np.zeros((np.size(xk),1))
+                for m in range(np.size(xk)):
+                    col[m] = delta_xk[m,i]
+                
+                grad1 = self.objGrad(xk + col)
                 grad2 = self.objGrad(xk)
-                H[i,j] = (grad1[j] - grad2[j]) / delta_x
+                H[i, j] = (grad1[j] - grad2[j]) / delta_x
+        
         
         # symmetrizing step:
         G = (1/2)*(H + H.transpose())
