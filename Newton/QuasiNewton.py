@@ -67,13 +67,24 @@ class DFP(QuasiNewton):
 
 class BFGS(QuasiNewton):
     def updateB(self,delta,gamma): 
-        print("delta: ",np.shape(np.transpose(delta)), "gamma: ",np.shape(gamma))
-        print("delta@gamma.T: ",delta@gamma.T)
+        #print("delta: ",np.shape(np.transpose(delta)), "gamma: ",np.shape(gamma))
+        #print("delta@gamma.T: ",delta@gamma.T)
         dTg = delta@gamma
         
         term1 = self.H_k + (1 + gamma@self.H_k@gamma/dTg)*(np.outer(delta,delta)/dTg)
         term2 = (np.outer(delta,gamma)@self.H_k + self.H_k@np.outer(gamma,delta)/dTg)
         return term1 - term2
+    
+#==============================================================================
+# class BroydenQ(QuasiNewton):
+#     def __init__(self, objFunc, objGrad, linesearch, tol, dim):
+#         super(BroydenQ, self).__init__(objFunc, objGrad, linesearch, tol, dim)
+#         self.Q_k = initialQ
+#     
+#     def updateB(self,delta,gamma):
+#         self.Q_k = self.Q_k + np.outer((gamma-Q_k@delta),delta)/np.dot(delta,delta)
+#         return inv(self.Q_k)
+#==============================================================================
         
     # Oklar Broydenmetod
 #==============================================================================
