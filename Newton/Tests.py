@@ -103,16 +103,14 @@ class Tests(ut.TestCase):
         for i in range(np.size(minimum)):
             self.assertAlmostEqual(minimum[i], 0, 3)
 
-#    def test_ClassicNewton_rosenbrock(self):
-#        x0 = np.array([5,5])
-#        problem = OptimizationProblem(self.functions.rosenbrock, self.functions.rosenbrockGrad)
-#        minimum = problem.solve(x0, self.tol, "ClassicNewton")
-#        for i in range(np.size(minimum)):
-#            self.assertAlmostEqual(minimum[i], 1, 3)
-#
+    def test_ClassicNewton_rosenbrock(self):
+        x0 = np.array([100,0])
+        problem = OptimizationProblem(self.functions.rosenbrock, self.functions.rosenbrockGrad)
+        minimum = problem.solve(x0, self.tol, "ClassicNewton")
+        self.assertAlmostEqual(self.functions.rosenbrock(minimum), self.functions.rosenbrock(np.array([1,1])))
+
 #    def test_ClassicNewton_chebyquad_n4(self):
-#        #x0 = np.array([5,5,5,5])
-#        x0 = np.linspace(0,1,4)
+#        x0 = np.array([5,5,5,5])
 #        problem = OptimizationProblem(self.functions.chebyquad, self.functions.chebyquadGrad)
 #        minimum = problem.solve(x0, self.tol, "ClassicNewton")
 #
@@ -180,33 +178,33 @@ class Tests(ut.TestCase):
         for i in range(np.size(x0)):
             self.assertAlmostEqual(minimum[i],0,3) 
         
-#    def test_GoodBroyden_exact_midPol2d(self):
-#        x0 = np.array([5,5])
-#        problem = OptimizationProblem(self.functions.midPol2d, self.functions.midPolGrad2d)
-#        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Exact")
-#        for i in range(np.size(minimum)):
-#            self.assertAlmostEqual(minimum[i], 0, 3)
-#        
-#    def test_GoodBroyden_inexact_midPol2d(self):
-#        x0 = np.array([5,5])
-#        problem = OptimizationProblem(self.functions.midPol2d, self.functions.midPolGrad2d)
-#        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Inexact")
-#        for i in range(np.size(minimum)):
-#            self.assertAlmostEqual(minimum[i], 0, 3)
-#            
-#    def test_GoodBroyden_exact_rosenbrock(self):
-#        x0 = np.array([1.5, 1.5])
-#        problem = OptimizationProblem(self.functions.rosenbrock, self.functions.rosenbrockGrad)
-#        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Exact")
-#        for i in range(np.size(minimum)):
-#            self.assertAlmostEqual(minimum[i], 1, 3)
-#        
-#    def test_GoodBroyden_inexact_rosenbrock(self):
-#        x0 = np.array([1.5, 1.5])
-#        problem = OptimizationProblem(self.functions.rosenbrock, self.functions.rosenbrockGrad)
-#        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Inexact")
-#        for i in range(np.size(minimum)):
-#            self.assertAlmostEqual(minimum[i], 1, 3)
+    def test_GoodBroyden_exact_midPol2d(self):
+        x0 = np.array([5,5])
+        problem = OptimizationProblem(self.functions.midPol2d, self.functions.midPolGrad2d)
+        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Exact")
+        for i in range(np.size(minimum)):
+            self.assertAlmostEqual(minimum[i], 0, 3)
+        
+    def test_GoodBroyden_inexact_midPol2d(self):
+        x0 = np.array([5,5])
+        problem = OptimizationProblem(self.functions.midPol2d, self.functions.midPolGrad2d)
+        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Inexact")
+        for i in range(np.size(minimum)):
+            self.assertAlmostEqual(minimum[i], 0, 3)
+            
+    def test_GoodBroyden_exact_rosenbrock(self):
+        x0 = np.array([1.5, 1.5])
+        problem = OptimizationProblem(self.functions.rosenbrock, self.functions.rosenbrockGrad)
+        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Exact")
+        self.assertAlmostEqual(self.functions.rosenbrock(minimum), self.functions.rosenbrock(np.array([1,1])))
+
+        
+    def test_GoodBroyden_inexact_rosenbrock(self):
+        x0 = np.array([1.5, 1.5])
+        problem = OptimizationProblem(self.functions.rosenbrock, self.functions.rosenbrockGrad)
+        minimum = problem.solve(x0, self.tol, "GoodBroyden", "Inexact")
+        self.assertAlmostEqual(self.functions.rosenbrock(minimum), self.functions.rosenbrock(np.array([1,1])))
+
 #            
 #    def test_GoodBroyden_exact_chebyquad_n4(self):
 #        x0 = np.array([1.5, 1.5, -3, 10])

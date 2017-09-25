@@ -32,7 +32,6 @@ class QuasiNewton(GenericNewton):
         # C) update Hk giving, offcourse Hk+1
     def step(self, xk):
         #A)
-        print(self.H_k)
         g_k = self.objGrad(xk)
         s_k = -self.H_k@g_k
         #B)
@@ -41,8 +40,7 @@ class QuasiNewton(GenericNewton):
         #C)
         delta = xnext-xk
         gamma = self.objGrad(xnext)-self.objGrad(xk)
-        self.H_k = self.updateB(delta,gamma)
-        #print(self.H_k)
+        self.H_k = self.updateH(delta,gamma)
         
         return -delta
    
@@ -51,47 +49,37 @@ class QuasiNewton(GenericNewton):
 # The following classes approximates the next hessian or hessian inverse.
 # Delta is the steplenght of the current step, and gamma is the change in 
 # gradient of the same step.
-class GoodBroyden(QuasiNewton):
-    def updateB(self,delta,gamma):
-        return self.H_k + np.outer((delta -self.H_k@gamma),delta)@self.H_k/(delta@self.H_k@gamma)
 
 class BadBroyden(QuasiNewton):
-    def updateB(self,delta,gamma): 
-        return self.H_k+np.outer((delta -self.H_k@gamma),gamma)/(gamma@gamma)
+    def updateH(self,delta,gamma): 
+        u = delta-(self.H_k@gamma)
+        a = 1/(np.dot(u,gamma))
+        return self.H_k+(a*np.outer(u,u))
+
 
 class DFP(QuasiNewton):
-    def updateB(self,delta,gamma):
+    def updateH(self,delta,gamma):
         term1 = self.H_k+(np.outer(delta,delta)/(delta@gamma))
         term2 = (self.H_k@np.outer(gamma,gamma)@self.H_k)/(gamma@self.H_k@gamma)
         return term1 - term2    
     
 
 class BFGS(QuasiNewton):
-    def updateB(self,delta,gamma): 
-        print("delta: ",np.shape(np.transpose(delta)), "gamma: ",np.shape(gamma))
-        print("delta@gamma.T: ",delta@gamma.T)
+    def updateH(self,delta,gamma): 
         dTg = delta@gamma
-        
         term1 = self.H_k + (1 + gamma@self.H_k@gamma/dTg)*(np.outer(delta,delta)/dTg)
-        term2 = (np.outer(delta,gamma)@self.H_k + self.H_k@np.outer(gamma,delta)/dTg)
+        term2 = (np.outer(delta,gamma)@self.H_k + self.H_k@np.outer(gamma,delta))/dTg
         return term1 - term2
     
-#==============================================================================
-# class BroydenQ(QuasiNewton):
-#     def __init__(self, objFunc, objGrad, linesearch, tol, dim):
-#         super(BroydenQ, self).__init__(objFunc, objGrad, linesearch, tol, dim)
-#         self.Q_k = initialQ
-#     
-#     def updateB(self,delta,gamma):
-#         self.Q_k = self.Q_k + np.outer((gamma-Q_k@delta),delta)/np.dot(delta,delta)
-#         return inv(self.Q_k)
-#==============================================================================
+# Broyden Rank1 update of Q
+
+class GoodBroyden(QuasiNewton):
+    def __init__(self, objFunc, objGrad, linesearch, tol, dim):
+        super(GoodBroyden, self).__init__(objFunc, objGrad, linesearch, tol, dim)
+        self.Q_k = np.eye(len(self.H_k))
+  
+
+    def updateH(self,delta,gamma):
+        self.Q_k = self.Q_k + np.outer((gamma-self.Q_k@delta),delta)/np.dot(delta,delta)
+        return solve(np.eye(len(self.Q_k)),(self.Q_k))
         
-    # Oklar Broydenmetod
-#==============================================================================
-#     class BadBroyden(QuasiNewton):
-#     def updateB(self,delta,gamma): 
-#         u = delta-(self.H_k@gamma)
-#         a = 1/(np.transpose(u)@gamma)
-#         return self.H_k+(a*u@np.transpose(u))
-#==============================================================================

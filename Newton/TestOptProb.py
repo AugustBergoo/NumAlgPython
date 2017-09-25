@@ -67,4 +67,4 @@ x03d = np.array([20, 2, 30])
 x04 = np.array([5,5])
 problem3 = OptimizationProblem(midPol2d, midPolGrad2d)
 minimum = problem3.solve(x04, tol, 'BFGS', 'Inexact')
-
+print(minimum)
