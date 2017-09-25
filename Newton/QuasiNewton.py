@@ -76,10 +76,10 @@ class BFGS(QuasiNewton):
 class GoodBroyden(QuasiNewton):
     def __init__(self, objFunc, objGrad, linesearch, tol, dim):
         super(GoodBroyden, self).__init__(objFunc, objGrad, linesearch, tol, dim)
-        self.Q_k = np.eye(len(self.H_k))
-  
+        self.Q_k = np.eye(dim)
 
+  
     def updateH(self,delta,gamma):
-        self.Q_k = self.Q_k + np.outer((gamma-self.Q_k@delta),delta)/np.dot(delta,delta)
+        self.Q_k = self.Q_k + np.outer((gamma-self.Q_k@delta),delta)/(delta@delta)
         return solve(np.eye(len(self.Q_k)),(self.Q_k))
         
