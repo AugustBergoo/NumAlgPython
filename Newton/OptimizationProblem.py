@@ -43,7 +43,7 @@ class OptimizationProblem():
         
         # Methods = 'ClassicNewton', 'GoodBroyden', 'BadBroyden', 'DFP' and 'BFGS'
         if method == 'ClassicNewton':
-            problem = ClassicNewton(self.objFunc, self.objGrad, tol)            
+            problem = ClassicNewton(self.objGrad, tol)            
         
         elif method == 'GoodBroyden':
             problem = GoodBroyden(self.objFunc, self.objGrad, linesearch, tol, dim) 
@@ -63,6 +63,6 @@ class OptimizationProblem():
         
         # Solves the problem
         minimum = problem.findMin(x0)
-        print('Value:', float(self.objFunc(minimum)))
+        return minimum
         
     

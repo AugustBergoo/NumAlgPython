@@ -32,6 +32,7 @@ class QuasiNewton(GenericNewton):
         # C) update Hk giving, offcourse Hk+1
     def step(self, xk):
         #A)
+        print(self.H_k)
         g_k = self.objGrad(xk)
         s_k = -self.H_k@g_k
         #B)
@@ -41,7 +42,7 @@ class QuasiNewton(GenericNewton):
         delta = xnext-xk
         gamma = self.objGrad(xnext)-self.objGrad(xk)
         self.H_k = self.updateB(delta,gamma)
-        print(self.H_k)
+        #print(self.H_k)
         
         return -delta
    
@@ -67,8 +68,8 @@ class DFP(QuasiNewton):
 
 class BFGS(QuasiNewton):
     def updateB(self,delta,gamma): 
-        #print("delta: ",np.shape(np.transpose(delta)), "gamma: ",np.shape(gamma))
-        #print("delta@gamma.T: ",delta@gamma.T)
+        print("delta: ",np.shape(np.transpose(delta)), "gamma: ",np.shape(gamma))
+        print("delta@gamma.T: ",delta@gamma.T)
         dTg = delta@gamma
         
         term1 = self.H_k + (1 + gamma@self.H_k@gamma/dTg)*(np.outer(delta,delta)/dTg)

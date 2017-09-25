@@ -16,14 +16,13 @@ from GenericNewton import GenericNewton
 
 class ClassicNewton(GenericNewton):
     
-    def __init__(self, objFunc, objGrad, tol):
+    def __init__(self, objGrad, tol):
         super(ClassicNewton, self).__init__(tol)
-        self.objFunc = objFunc  #Oanvänd, så jag kanske inte ska ha denna raden kod.
         self.objGrad = objGrad
         
     
     def step(self, xk):
-        delta_x = 0.01 #Ska vi ha detta som inparameter?
+        delta_x = 0.01
         
         # Create empty Hessian
         H = np.zeros((np.size(xk),np.size(xk)))
@@ -46,9 +45,6 @@ class ClassicNewton(GenericNewton):
         # symmetrizing step:
         G = (1/2)*(H + H.transpose())
         
-        # Test om G är pos. def. Raise exception if not:
-        is_pd(G)
-        
         # Apply choleskys method to turn G into an (upper) trangle matrix.
         A = sl.cholesky(G)
         
@@ -60,9 +56,5 @@ class ClassicNewton(GenericNewton):
     
 # Test for potitive definiteness:
 def is_pd(K):
-    try:
-        np.linalg.cholesky(K)
-        return 1 
-    except np.linalg.LinAlgError as err:
-        if 'Matrix is not positive definite' in err.message:
-            return 0
+    np.linalg.cholesky(K)
+    return 1 

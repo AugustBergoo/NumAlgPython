@@ -32,8 +32,8 @@ def hardPolGrad2d(x):
 
 
 dk=np.array([-1,-1])
-x0=np.array([5,5])
-tol=0.000001
+x0=np.array([1.1,1.1])
+tol=0.01
 
 #m = x0 + Linesearch.inexactLinesearch(x0,dk,esyPol2d,esyPolGrad2d)*dk
 
@@ -45,5 +45,5 @@ tol=0.000001
 #plt.show()
 
 #x01=np.array([200])
-problemPol = OptimizationProblem(midPol2d,midPolGrad2d)
-problemPol.solve(x0, tol, "BadBroyden", "Inexact")
+problemPol = OptimizationProblem(hardPol2d, hardPolGrad2d)
+problemPol.solve(x0, tol, "ClassicNewton", "Exact")
