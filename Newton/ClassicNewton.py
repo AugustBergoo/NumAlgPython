@@ -34,9 +34,6 @@ class ClassicNewton(GenericNewton):
         for i in range(np.size(xk)):
             vec = np.zeros((np.size(xk), 1))
             vec[i] = delta_x
-            #temp = delta_x * vec
-            #delta_xk[0,i] = xk[0] + temp[0]
-            #delta_xk[1,i] = xk[1] + temp[1]
             delta_xk[:,i] = xk[:,0] + delta_x * vec[:,0]
             
         # Calc values of Hessian by finite differences:
