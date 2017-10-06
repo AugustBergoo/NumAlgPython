@@ -9,38 +9,36 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pylab import cm,imshow,colorbar,title,show
 
-
-
 class Apartment:
     
     #The Apartment class creates an apartment with arbitrary many rectangular rooms.
     #it is asumed the rooms are conected and does not overlap.
     #rooms: nx4 np.array: one row is one room: firts two numbers are base and height,
     #second two define the upper left corner coordinate of the room (base,height,x,y)
-    def __init__(self,rooms,dx):
-        self.dx=dx
+    def __init__(self, rooms, dx):
+        self.dx = dx
         self.rooms = rooms
-        self.NmbrNodes=0
+        self.NmbrNodes = 0
         
         #remeber that some nodes exist twice since they are part of two rooms
-        for i in range(0,len(rooms[:,0])):
-            rows= int(rooms[i,1]/self.dx)+1
-            colons = int(rooms[i,0]/self.dx)+1
+        for i in range(0, len(rooms[:,0])):
+            rows = int(rooms[i,1]/self.dx) + 1
+            colons = int(rooms[i,0]/self.dx) + 1
             self.NmbrNodes = self.NmbrNodes + (rows*colons)
         self.coord = self.coord_extract()
-        self.coord_by_room=[]
-        count=0
-        for i in range(0,len(rooms[:,0])):
-            NbrRoomNodes=int((rooms[i,0]/dx+1)*(rooms[i,1]/dx+1))
+        self.coord_by_room = []
+        count = 0
+        for i in range(0, len(rooms[:,0])):
+            NbrRoomNodes = int((rooms[i,0]/dx+1)*(rooms[i,1]/dx+1))
             self.coord_by_room.append(self.coord[count:(count+NbrRoomNodes),:])
             count = count + NbrRoomNodes
-        self.linkedNodes=self.linked_nodes()
+        self.linkedNodes = self.linked_nodes()
         
     #Here we plot the the nodes of the geometry along with the node labels and
     #the room labels. This is good to run to understand and check that all is
     #as expected.     
     def plot_mesh(self):
-        for i in range(0,self.NmbrNodes):
+        for i in range(0, self.NmbrNodes):
             plt.plot(self.coord[i,2],self.coord[i,3],'ro')
             plt.annotate(int(self.coord[i,0]), xy=(self.coord[i,2],self.coord[i,3]))
  
@@ -64,7 +62,7 @@ class Apartment:
         im = imshow(z,cm.gnuplot2,interpolation='bilinear')
         colorbar(im) 
         title('$Apartment$ $Temperature$ $Distribution$',fontsize=15)
-        show()     
+        show()
         
     # Private Internal method for constructing the coord matrix.(don't run this outside) 
     # 1ts colon: node number, 2d colon: xCoord, 3rd colon: ycoord, 4th colon: Temperature
@@ -91,31 +89,42 @@ class Apartment:
     #use this function. The temperature is set to "Temperature" between (x1,y1)
     #and (x2,y2).
     def set_boundary(self,x1,y1,x2,y2,Temperature,BCtype1,roomNbr): #0 inget #1 dirichlet #2Neuman
+        if x1 > x2:
+            temp = x1
+            x1 = x2
+            x2 = temp
+        if y1 > y2:
+            temp = y1
+            y1 = y2
+            y2 = temp
+    
         for i in range(0,self.NmbrNodes):
             if self.coord[i,1]==roomNbr and x1<=self.coord[i,2]<=x2 and y1<=self.coord[i,3]<=y2:
                 self.coord[i,4]=Temperature
                 self.coord[i,5]=BCtype1
-                    
                 
     #We can update all the temperatures of a room of the apartment via this 
     #function. The new temperatures goes in as a vector with lenght equal
     #to the number of nodes in the specified room.
-    def update_temperature(self,roomNbr,newTemperatures):
+    def update_temperature(self,newTemperatures,roomNbr=None):
+        if roomNbr == None:
+            self.coord[:,4] = newTemperatures
+            return
+        
         room= self.get_coord_for_room(roomNbr)  
         room[:,4]=newTemperatures
         node=0
         for i in range(0,len(self.linkedNodes)):
             for j in range(0,len(room[:,0])):
                 if self.linkedNodes[i]==room[j,0]:
-                    
+                        
                     if i%2==0:
                         node=int(round((self.linkedNodes[i+1])))
                         self.coord[node,4]=room[j,4]
                     else:
                         node=int(round(self.linkedNodes[i-1]))
                         self.coord[node,4]=room[j,4]
-                        
-        
+            
            
     def linked_nodes(self):
         link = []
@@ -135,14 +144,5 @@ class Apartment:
     def get_coord_for_room(self,roomNbr):
         return self.coord_by_room[roomNbr]
     
-
-        
-        
-        
-        
-        
-        
-        
-        
 
 

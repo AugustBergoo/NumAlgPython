@@ -19,7 +19,7 @@ from timeit import default_timer as timer
 
 np.set_printoptions(threshold=np.nan)   #so that we can see all of the matrices     
 
-dx=1/2 #choose a grit distance (the computing power needed depends heavily on dx)
+dx=1/20 #choose a grid distance (the computing power needed depends heavily on dx)
 
 #specify you rectangular rooms. Each row is a room and comprises 4 peices of 
 #information. first number is: BASE length, Second is:HEIGHT,
@@ -105,7 +105,7 @@ links = myApartment.get_links()
 #finaly lets learn how to update all the  temperatures of a room.
 newTemperature=np.linspace(1,50,len(room3[:,0]))
 startupdate = timer()
-myApartment.update_temperature(2,newTemperature)
+myApartment.update_temperature(newTemperature, 2)
 endupdate = timer()
 print("Creating an apartment with dx= ",dx," takes: ",(endApartment-startApartment)*1000," ms")
 print("-----------------------")
