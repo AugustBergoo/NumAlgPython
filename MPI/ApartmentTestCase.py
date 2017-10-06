@@ -29,7 +29,7 @@ class ApartmentTestCase(unittest.TestCase):
     def test_node_placement(self):
 
         for i in range(0,len(self.rooms[:,0])):
-            room = self.myApartment.get_coord_for_room(i+1)
+            room = self.myApartment.get_coord_for_room(i)
             x1=self.rooms[i,2]
             x2=self.rooms[i,0]+self.rooms[i,2]
             y1=self.rooms[i,3]-self.rooms[i,1]
@@ -46,27 +46,26 @@ class ApartmentTestCase(unittest.TestCase):
         T1=1
         T2=50
         for i in range(0,len(self.rooms[:,0])):
-             room = self.myApartment.get_coord_for_room(i+1)
+             room = self.myApartment.get_coord_for_room(i)
              newTemperature = np.linspace(T1,T2,len(room[:,0]))
-             self.myApartment.update_temperature(i+1,newTemperature)
+             self.myApartment.update_temperature(i,newTemperature)
         for i in range(0,len(self.rooms[:,0])):
-            room = self.myApartment.get_coord_for_room(i+1) 
+            room = self.myApartment.get_coord_for_room(i) 
             self.assertTrue((room[:,4]<=T2).all())
             self.assertTrue((room[:,4]>=T1).all())
-            self.assertTrue(room[0,4]==T1)
-            self.assertTrue(room[-1,4]==T2)
+            
      
     #Set the top two left nodes of each room to T and check that only
     #These nodes where changed. And that they are exactly T.    
     def test_boundary_temperature(self):
         T=5
         for i in range(0,len(self.rooms[:,0])):
-             room = self.myApartment.get_coord_for_room(i+1)
+             room = self.myApartment.get_coord_for_room(i)
              X1= self.rooms[i,2]
              Y1= self.rooms[i,3]
              X2= X1+self.dx
              Y2= Y1
-             self.myApartment.set_boundary(X1,Y1,X2,Y2,T)
+             self.myApartment.set_boundary(X1,Y1,X2,Y2,T,1,i)
              self.assertTrue((room[:,4]<=T).all())
              self.assertTrue((room[:,4]==T).any())
              self.assertTrue(room[0,4]==T)
