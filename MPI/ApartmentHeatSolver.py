@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Oct  5 08:58:27 2017
-@author: Hedin,
+@author: Axel H, Simon J, August B, Erik S, Gustav H.
 """
 
 from pylab import *

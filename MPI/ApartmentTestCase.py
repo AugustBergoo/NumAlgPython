@@ -48,7 +48,7 @@ class ApartmentTestCase(unittest.TestCase):
         for i in range(0,len(self.rooms[:,0])):
              room = self.myApartment.get_coord_for_room(i)
              newTemperature = np.linspace(T1,T2,len(room[:,0]))
-             self.myApartment.update_temperature(i,newTemperature)
+             self.myApartment.update_temperature(newTemperature, i)
         for i in range(0,len(self.rooms[:,0])):
             room = self.myApartment.get_coord_for_room(i) 
             self.assertTrue((room[:,4]<=T2).all())
