@@ -130,8 +130,8 @@ class Apartment:
         link = []
         for j in range(0,self.NmbrNodes):   
             for i in range(j+1,self.NmbrNodes):
-                
-                if self.coord[j,2]==self.coord[i,2] and self.coord[j,3]==self.coord[i,3]:
+                threshold = self.dx/5    
+                if abs(self.coord[j,2]-self.coord[i,2])<threshold and abs(self.coord[j,3]-self.coord[i,3])<threshold:
                     
                     link.append(self.coord[j,0])
                     link.append(self.coord[i,0])

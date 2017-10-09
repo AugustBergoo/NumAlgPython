@@ -1,9 +1,11 @@
 import scipy
 import numpy as np
-from Apartment import Apartment as ap
+import Apartment as ap
 
 
-def PDE_solve(room, dx):
+def PDE_solve(room):
+    
+    dx = room[1,2] - room[0,2]
     
     # Find the dimensions of the room
     n_matrix = int((room[-1,2] - room[0,2]) * 1/dx + 1)
@@ -33,6 +35,8 @@ def PDE_solve(room, dx):
     
     index = 0
     bc = np.zeros((n*m,1))
+    g = np.zeros((m,1))
+    # 2 is the amount of neumann nodes
     for i in range(n_matrix+1, m_matrix*n_matrix - n_matrix-1, n_matrix):
         for j in range(n_matrix-2):
             coord = i + j
@@ -47,8 +51,8 @@ def PDE_solve(room, dx):
             elif(room[coord-1, 5] == 2):    
                 for k in range(n):
                     T[k*n,k*n] = -3
-                g = (room[coord-1, 4] - room[coord, 4]) / dx
-                bc[index] = bc[index] + dx * g #TODO: Get g somehow
+                g[0] = (room[coord-1, 4] - room[coord, 4]) / dx
+                bc[index] = bc[index] + dx * g[0] #TODO: Get g somehow
                 print('NEUMAAN DETECTED LEFT!')
                 
             if(room[coord+1, 5] == 1):
@@ -56,8 +60,8 @@ def PDE_solve(room, dx):
             elif(room[coord+1, 5] == 2):
                 for k in range(n):
                     T[(k+1)*n-1,(k+1)*n-1] = -3
-                g = (room[coord+1, 4] - room[coord, 4]) / dx
-                bc[index] = bc[index] + dx * g #TODO: Get g somehow
+                g[1] = (room[coord+1, 4] - room[coord, 4]) / dx
+                bc[index] = bc[index] + dx * g[1] #TODO: Get g somehow
                 print('NEUMAAN DETECTED RIGHT!')
                  
             if(room[coord+n_matrix, 5] == 1):
@@ -84,26 +88,33 @@ def PDE_solve(room, dx):
             coord = i + j
             room[coord, 4] = u[index]
             index = index + 1
-    print(room)
-    
+            
     # TODO: Make sure that the Neumann boundary gets an updated temperature 
-
+    index = 0
+    for i in range(n_matrix*m_matrix):
+        if (room[i, 5] == 2):
+            if (i % n_matrix == 0):
+                room[i, 4] = g[index] * dx + room[i+1, 4] 
+            else:
+                room[i, 4] = -g[index] * dx + room[i-1, 4] 
+            index = index + 1
+    print(room)
 #np.set_printoptions(threshold = np.nan)
-
-dx = 1/3
-rooms = np.array([[1,1,0,1]])
-myApartment = Apartment(rooms, dx)
-
-myApartment.set_boundary(0,0,0,1,0,2,0)
-myApartment.set_boundary(0,1,1,1,15,1,0)
-myApartment.set_boundary(1,0,1,1,15,1,0)
-myApartment.set_boundary(0,0,1,0,15,1,0)
-
-room = myApartment.get_coord()
-print(room)
-myApartment.plot_mesh()
-
-PDE_solve(room, dx)
+#
+#dx = 1/3
+#rooms = np.array([[1,1,0,1]])
+#myApartment = Apartment(rooms, dx)
+#
+#myApartment.set_boundary(0,0,0,1,0,2,0)
+#myApartment.set_boundary(0,1,1,1,15,1,0)
+#myApartment.set_boundary(1,0,1,1,15,1,0)
+#myApartment.set_boundary(0,0,1,0,15,1,0)
+#
+#room = myApartment.get_coord()
+#print(room)
+#myApartment.plot_mesh()
+#
+#PDE_solve(room)
 #dx = 1/3
 #room = np.array([0,0,0,0])
 #bc = np.array([-2,-2,-2,-2]) * 1/dx**2
