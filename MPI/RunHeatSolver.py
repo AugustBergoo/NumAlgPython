@@ -14,7 +14,7 @@ import ApartmentHeatSolver as ahs
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 
-dx = 1/3 # choose a grid distance (the computing power needed depends heavily on dx).
+dx = 1/20 # choose a grid distance (the computing power needed depends heavily on dx).
 itr = 10 # Choose the number of iterations to perform.
 
 # Specify you rectangular rooms. Each row is a room and comprises 4 peices of 
@@ -26,7 +26,7 @@ rooms = np.array([[1,1,0,1], [1,2,1,2], [1,1,2,2]]) # Our geometry look like thi
 # Make an apartment object. YAY! :). Send in the rooms matrix and the dx.
 myApartment = ap.Apartment(rooms, dx)
 
-roomTemp = 20
+roomTemp = 0
 myApartment.set_boundary(1, 0, 1, 1, roomTemp, 2, 0) # Between rooms
 myApartment.set_boundary(1, 0, 1, 1, roomTemp, 1, 1) # Between rooms
 myApartment.set_boundary(2, 1, 2, 2, roomTemp, 1, 1) # Between rooms
@@ -59,6 +59,5 @@ heatSolver = ahs.ApartmentHeatSolver()
 heatSolver.solve(myApartment, itr)
 
 if rank == 1:
-    plt.figure()
     plt.figure(figsize=(10,7))
     myApartment.plot_temperature()
